@@ -8,7 +8,7 @@ import json
 
 import api_key
 
-POPULATION = 51829023   # 2020. Dec
+POPULATION = 51278340   # 2020. Dec
 DATE_INTERVAL = 7
 
 today = datetime.date.today()
@@ -59,9 +59,16 @@ if not api_result['data'][-1]['baseDate'][:11] in date_array:
 xtick_array = [i for i in range(diff) if i % DATE_INTERVAL == 0]
 xtick_array.append(diff - 1) if (diff - 1) % DATE_INTERVAL != 0 else None
 
+# Before 09:35, data is not received yet
+if api_result['currentCount'] != diff:
+    xtick_array.pop()
+    xtick_array.append(diff - 2)
+
 plt.figure(figsize=(13, 7))
 plt.plot(first_cumulative, label='First', marker='.')
 plt.plot(second_cumulative, label='Second', marker='.')
+
+plt.xlabel('1st : {0:,}, 2nd : {1:,}\ntotal : {2:,}'.format(first_cumulative[-1], second_cumulative[-1], POPULATION))
 
 plt.annotate("{0:0.1f}%".format(first_cumulative[-1] / POPULATION * 100), (diff - 1, first_cumulative[-1]))
 plt.annotate("{0:0.1f}%".format(second_cumulative[-1] / POPULATION * 100), (diff - 1, second_cumulative[-1]))

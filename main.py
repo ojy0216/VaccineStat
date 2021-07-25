@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 from matplotlib.ticker import PercentFormatter
 import datetime
+from datetime import date
 
 import urllib.request
 from urllib.parse import urlencode, quote_plus
@@ -37,8 +38,7 @@ print(api_request_body)
 api_result = json.loads(api_request_body)
 
 date_array = []
-first_cumulative = []
-second_cumulative = []
+raw_data = {}
 
 for i, data in enumerate(api_result['data']):
     print(
@@ -48,13 +48,23 @@ for i, data in enumerate(api_result['data']):
         data['accumulatedSecondCnt'],
         data['secondCnt']
     )
-    date_array.append(data['baseDate'][:11]) if i % DATE_INTERVAL == 0 else None
+    date_array.append(data['baseDate'][:10]) if i % DATE_INTERVAL == 0 else None
 
-    first_cumulative.append(data['accumulatedFirstCnt'] + data['firstCnt'])
-    second_cumulative.append(data['accumulatedSecondCnt'] + data['secondCnt'])
+    raw_data[data['baseDate'][:10]] = (
+        data['accumulatedFirstCnt'] + data['firstCnt'],
+        data['accumulatedSecondCnt'] + data['secondCnt']
+    )
 
-if not api_result['data'][-1]['baseDate'][:11] in date_array:
-    date_array.append(api_result['data'][-1]['baseDate'][:11])
+raw_data_sorted = sorted(raw_data.items())
+_, data = zip(*raw_data_sorted)
+first_cumulative, second_cumulative = zip(*data)
+
+if not api_result['data'][-1]['baseDate'][:10] in date_array:
+    date_array.append(api_result['data'][-1]['baseDate'][:10])
+
+# To improve xtick visibility
+if (date.fromisoformat(date_array[-1]) - date.fromisoformat((date_array[-2]))).days <= 2:
+    date_array.pop(-2)
 
 xtick_array = [i for i in range(diff) if i % DATE_INTERVAL == 0]
 xtick_array.append(diff - 1) if (diff - 1) % DATE_INTERVAL != 0 else None

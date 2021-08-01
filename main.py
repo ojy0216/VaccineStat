@@ -62,12 +62,13 @@ first_cumulative, second_cumulative = zip(*data)
 if not api_result['data'][-1]['baseDate'][:10] in date_array:
     date_array.append(api_result['data'][-1]['baseDate'][:10])
 
+xtick_array = [i for i in range(diff) if i % DATE_INTERVAL == 0]
+xtick_array.append(diff - 1) if (diff - 1) % DATE_INTERVAL != 0 else None
+
 # To improve xtick visibility
 if (date.fromisoformat(date_array[-1]) - date.fromisoformat((date_array[-2]))).days <= 2:
     date_array.pop(-2)
-
-xtick_array = [i for i in range(diff) if i % DATE_INTERVAL == 0]
-xtick_array.append(diff - 1) if (diff - 1) % DATE_INTERVAL != 0 else None
+    xtick_array.pop(-2)
 
 # Before 09:35, data is not received yet
 if api_result['currentCount'] != diff:

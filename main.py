@@ -1,3 +1,4 @@
+import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import PercentFormatter
 import datetime
@@ -9,7 +10,7 @@ import json
 
 import api_key
 
-POPULATION = 51278340   # 2020. Dec
+POPULATION = 51349116   # 2020. Dec
 DATE_INTERVAL = 7
 
 today = datetime.date.today()
@@ -43,21 +44,25 @@ raw_data = {}
 for i, data in enumerate(api_result['data']):
     print(
         data['baseDate'][:11],
-        data['accumulatedFirstCnt'],
+        data['totalFirstCnt'],
+        data['totalSecondCnt'],
+        # data['accumulatedFirstCnt'],
         data['firstCnt'],
-        data['accumulatedSecondCnt'],
+        # data['accumulatedSecondCnt'],
         data['secondCnt']
     )
     date_array.append(data['baseDate'][:10]) if i % DATE_INTERVAL == 0 else None
 
     raw_data[data['baseDate'][:10]] = (
-        data['accumulatedFirstCnt'] + data['firstCnt'],
-        data['accumulatedSecondCnt'] + data['secondCnt']
+        data['totalFirstCnt'],
+        data['totalSecondCnt'],
+        data['firstCnt'],
+        data['secondCnt']
     )
 
 raw_data_sorted = sorted(raw_data.items())
 _, data = zip(*raw_data_sorted)
-first_cumulative, second_cumulative = zip(*data)
+first_cumulative, second_cumulative, first_daily, second_daily = zip(*data)
 
 if not api_result['data'][-1]['baseDate'][:10] in date_array:
     date_array.append(api_result['data'][-1]['baseDate'][:10])
@@ -75,16 +80,35 @@ if api_result['currentCount'] != diff:
     xtick_array.pop()
     xtick_array.append(diff - 2)
 
-plt.figure(figsize=(13, 7))
+plt.figure(figsize=(20, 10))
+
+plt.subplot(2, 1, 1)
 plt.plot(first_cumulative, label='First', marker='.')
 plt.plot(second_cumulative, label='Second', marker='.')
 
 plt.xlabel('1st : {0:,}, 2nd : {1:,}\ntotal : {2:,}'.format(first_cumulative[-1], second_cumulative[-1], POPULATION))
 
+plt.title("Accumulated vaccination")
+
 plt.annotate("{0:0.1f}%".format(first_cumulative[-1] / POPULATION * 100), (diff - 1, first_cumulative[-1]))
 plt.annotate("{0:0.1f}%".format(second_cumulative[-1] / POPULATION * 100), (diff - 1, second_cumulative[-1]))
 
 plt.gca().yaxis.set_major_formatter(PercentFormatter(POPULATION))
+
+plt.xlim(-1, diff)
+plt.legend()
+plt.grid(alpha=0.5)
+plt.xticks(xtick_array, labels=date_array, rotation=45)
+plt.tight_layout()
+
+plt.subplot(2, 1, 2)
+
+WIDTH = 0.4
+
+plt.bar(np.arange(diff) - WIDTH / 2, first_daily, width=WIDTH, label='First')
+plt.bar(np.arange(diff) + WIDTH / 2, second_daily, width=WIDTH, label='Second')
+
+plt.title("Daily vaccination")
 
 plt.xlim(-1, diff)
 plt.legend()

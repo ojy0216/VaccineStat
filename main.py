@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.ticker import PercentFormatter
+from matplotlib.ticker import PercentFormatter, StrMethodFormatter
 import datetime
 from datetime import date
 
@@ -78,7 +78,8 @@ if (date.fromisoformat(date_array[-1]) - date.fromisoformat((date_array[-2]))).d
 # Before 09:35, data is not received yet
 if api_result['currentCount'] != diff:
     xtick_array.pop()
-    xtick_array.append(diff - 2)
+    if xtick_array[-1] != diff - 2:
+        xtick_array.append(diff - 2)
 
 plt.figure(figsize=(20, 10))
 
@@ -105,8 +106,10 @@ plt.subplot(2, 1, 2)
 
 WIDTH = 0.4
 
-plt.bar(np.arange(diff) - WIDTH / 2, first_daily, width=WIDTH, label='First')
-plt.bar(np.arange(diff) + WIDTH / 2, second_daily, width=WIDTH, label='Second')
+plt.bar(np.arange(len(first_daily)) - WIDTH / 2, first_daily, width=WIDTH, label='First')
+plt.bar(np.arange(len(second_daily)) + WIDTH / 2, second_daily, width=WIDTH, label='Second')
+
+plt.gca().yaxis.set_major_formatter(StrMethodFormatter('{x:,.0f}'))
 
 plt.title("Daily vaccination")
 

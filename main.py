@@ -90,7 +90,7 @@ plt.figure(figsize=(20, 10))
 plt.subplot(2, 1, 1)
 plt.plot(first_cumulative, label='First', marker='.')
 plt.plot(second_cumulative, label='Second', marker='.')
-plt.plot(third_cumulative, label='Second', marker='.')
+plt.plot(third_cumulative, label='Third', marker='.')
 
 plt.xlabel('1st : {0:,}, 2nd : {1:,}, 3nd : {2:,}\ntotal : {3:,}'.
            format(first_cumulative[-1], second_cumulative[-1], third_cumulative[-1], POPULATION))

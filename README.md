@@ -5,4 +5,4 @@
     * Data updates at every 09:35[KST]
     
 ## Result Example
-<img src="https://user-images.githubusercontent.com/47859342/121283656-7687b200-c916-11eb-8289-2b482cce70b1.png">
+<img src="https://user-images.githubusercontent.com/47859342/145940846-aeeeacec-0e5c-40ce-929c-b7998041876f.png">

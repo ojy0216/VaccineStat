@@ -46,23 +46,27 @@ for i, data in enumerate(api_result['data']):
         data['baseDate'][:11],
         data['totalFirstCnt'],
         data['totalSecondCnt'],
+        data['totalThirdCnt'],
         # data['accumulatedFirstCnt'],
         data['firstCnt'],
         # data['accumulatedSecondCnt'],
-        data['secondCnt']
+        data['secondCnt'],
+        data['thirdCnt']
     )
     date_array.append(data['baseDate'][:10]) if i % DATE_INTERVAL == 0 else None
 
     raw_data[data['baseDate'][:10]] = (
         data['totalFirstCnt'],
         data['totalSecondCnt'],
+        data['totalThirdCnt'],
         data['firstCnt'],
-        data['secondCnt']
+        data['secondCnt'],
+        data['thirdCnt']
     )
 
 raw_data_sorted = sorted(raw_data.items())
 _, data = zip(*raw_data_sorted)
-first_cumulative, second_cumulative, first_daily, second_daily = zip(*data)
+first_cumulative, second_cumulative, third_cumulative, first_daily, second_daily, third_daily = zip(*data)
 
 if not api_result['data'][-1]['baseDate'][:10] in date_array:
     date_array.append(api_result['data'][-1]['baseDate'][:10])
@@ -86,13 +90,16 @@ plt.figure(figsize=(20, 10))
 plt.subplot(2, 1, 1)
 plt.plot(first_cumulative, label='First', marker='.')
 plt.plot(second_cumulative, label='Second', marker='.')
+plt.plot(third_cumulative, label='Second', marker='.')
 
-plt.xlabel('1st : {0:,}, 2nd : {1:,}\ntotal : {2:,}'.format(first_cumulative[-1], second_cumulative[-1], POPULATION))
+plt.xlabel('1st : {0:,}, 2nd : {1:,}, 3nd : {2:,}\ntotal : {3:,}'.
+           format(first_cumulative[-1], second_cumulative[-1], third_cumulative[-1], POPULATION))
 
 plt.title("Accumulated vaccination")
 
 plt.annotate("{0:0.1f}%".format(first_cumulative[-1] / POPULATION * 100), (diff - 1, first_cumulative[-1]))
 plt.annotate("{0:0.1f}%".format(second_cumulative[-1] / POPULATION * 100), (diff - 1, second_cumulative[-1]))
+plt.annotate("{0:0.1f}%".format(third_cumulative[-1] / POPULATION * 100), (diff - 1, third_cumulative[-1]))
 
 plt.gca().yaxis.set_major_formatter(PercentFormatter(POPULATION))
 
@@ -104,10 +111,11 @@ plt.tight_layout()
 
 plt.subplot(2, 1, 2)
 
-WIDTH = 0.4
+WIDTH = 0.25
 
-plt.bar(np.arange(len(first_daily)) - WIDTH / 2, first_daily, width=WIDTH, label='First')
-plt.bar(np.arange(len(second_daily)) + WIDTH / 2, second_daily, width=WIDTH, label='Second')
+plt.bar(np.arange(len(first_daily)) - WIDTH, first_daily, width=WIDTH, label='First')
+plt.bar(np.arange(len(second_daily)), second_daily, width=WIDTH, label='Second')
+plt.bar(np.arange(len(third_daily)) + WIDTH, third_daily, width=WIDTH, label='Third')
 
 plt.gca().yaxis.set_major_formatter(StrMethodFormatter('{x:,.0f}'))
 
